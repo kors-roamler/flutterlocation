@@ -12,3 +12,4 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
+  latlong: any

@@ -13,9 +13,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Map<String,double> _currentLocation;
-  StreamSubscription<Map<String,double>> _locationSubscription;
-  Location _location = new Location();
+  Position _currentPosition;
+  StreamSubscription<Position> _positionSubscription;
 
   bool currentWidget = true;
 
@@ -27,22 +26,22 @@ class _MyAppState extends State<MyApp> {
   initState() {
     super.initState();
     initPlatformState();
-    _locationSubscription =
-        _location.onLocationChanged.listen((Map<String,double> result) {
+    _positionSubscription =
+        onPositionChanged.listen((Position result) {
           setState(() {
-            _currentLocation = result;
+            _currentPosition = result;
           });
         });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   initPlatformState() async {
-    Map<String,double> location;
+    Position location;
     // Platform messages may fail, so we use a try/catch PlatformException.
 
 
     try {
-      location = await _location.getLocation;
+      location = await getPosition;
     } on PlatformException {
       location = null;
     }
@@ -54,17 +53,17 @@ class _MyAppState extends State<MyApp> {
       return;
 
     setState(() {
-      _currentLocation = location;
+      _currentPosition = location;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     if(currentWidget){
-      image1 = new Image.network("https://maps.googleapis.com/maps/api/staticmap?center=${_currentLocation["latitude"]},${_currentLocation["longitude"]}&zoom=18&size=640x400&key=YOUR_API_KEY");
+      image1 = new Image.network("https://maps.googleapis.com/maps/api/staticmap?center=${_currentPosition.latLng.latitude},${_currentPosition.latLng.longitude}&zoom=18&size=640x400&key=YOUR_API_KEY");
       currentWidget = !currentWidget;
     }else{
-      image2 = new Image.network("https://maps.googleapis.com/maps/api/staticmap?center=${_currentLocation["latitude"]},${_currentLocation["longitude"]}&zoom=18&size=640x400&key=YOUR_API_KEY");
+      image2 = new Image.network("https://maps.googleapis.com/maps/api/staticmap?center=${_currentPosition.latLng.latitude},${_currentPosition.latLng.longitude}&zoom=18&size=640x400&key=YOUR_API_KEY");
       currentWidget = !currentWidget;
     }
 
@@ -80,7 +79,7 @@ class _MyAppState extends State<MyApp> {
             children: <Widget>[
               new Stack(
                 children: <Widget>[image1, image2]),
-              new Center(child:new Text('$_currentLocation\n')),
+              new Center(child:new Text('$_currentPosition\n')),
             ],
           )
         )

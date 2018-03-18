@@ -1,21 +1,32 @@
 import 'dart:async';
+import 'package:latlong/latlong.dart';
 
 import 'package:flutter/services.dart';
 
-class Location {
-  static const MethodChannel _channel = const MethodChannel('lyokone/location');
-  static const EventChannel _stream = const EventChannel('lyokone/locationstream');
+const MethodChannel _channel = const MethodChannel('lyokone/location');
+const EventChannel _stream = const EventChannel('lyokone/locationstream');
 
-  Stream<Map<String,double>> _onLocationChanged;
+Stream<Position> _onPositionChanged;
 
-  Future<Map<String,double>> get getLocation =>
-      _channel.invokeMethod('getLocation');
+Future<Position> get getPosition => _channel.invokeMethod('getLocation');
 
-  Stream<Map<String,double>> get onLocationChanged {
-    if (_onLocationChanged == null) {
-      _onLocationChanged =
-          _stream.receiveBroadcastStream();
-    }
-    return _onLocationChanged;
+Stream<Position> get onPositionChanged {
+  if (_onPositionChanged == null) {
+    _onPositionChanged = _stream.receiveBroadcastStream().map(toPosition);
   }
+  return _onPositionChanged;
+}
+
+class Position {
+  final LatLng latLng;
+  final double accuracy;
+  final double altitude;
+
+  Position(this.latLng, this.accuracy, this.altitude);
+}
+
+Position toPosition(dynamic event) {
+  var map = event as Map;
+  return new Position(new LatLng(map['latitude'] as double, map['latitude'] as double),
+      map['accuracy'] as double, map['altitude'] as double);
 }

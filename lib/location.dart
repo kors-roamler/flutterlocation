@@ -8,7 +8,10 @@ const EventChannel _stream = const EventChannel('lyokone/locationstream');
 
 Stream<Position> _onPositionChanged;
 
-Future<Position> get getPosition => _channel.invokeMethod('getLocation');
+Future<Position> get getPosition async {
+  final blaat = await _channel.invokeMethod('getLocation');
+  return toPosition(blaat);
+}
 
 Stream<Position> get onPositionChanged {
   if (_onPositionChanged == null) {
